@@ -1,1 +1,51 @@
 // TODO
+
+.posts {
+  max-width: 720px;
+  margin: 2rem 0;
+
+  a {
+    display: block;
+
+    &:hover {
+      filter: brightness(1.4);
+    }
+
+    h1 {
+      color: var(--heading);
+      font-size: 2rem;
+      line-height: 3rem;
+      font-weight: 700;
+    }
+
+    p {
+      line-height: 2.5rem;
+      font-size: 1rem;
+      color: var(--body);
+    }
+
+    & + a {
+      margin-top: 2rem;
+    }
+  }
+
+  .postInfo {
+    display: flex;
+    flex-direction: row;
+
+    div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      p,
+      time {
+        margin-left: 0.2rem;
+      }
+
+      & + div {
+        margin-left: 1rem;
+      }
+    }
+  }
+}
