@@ -72,6 +72,9 @@ export default function Home({ postsPagination }: HomeProps) {
               </div>
             </a>
           </Link>
+          <div className={styles.postsFooter}>
+            <button type="button">Carregar mais posts</button>
+          </div>
         </div>
       </main>
     </>
