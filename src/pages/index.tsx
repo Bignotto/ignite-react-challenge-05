@@ -43,7 +43,18 @@ export default function Home({ postsPagination }: HomeProps) {
       const data = await response.json();
       setNext(data.next_page);
 
-      const addPosts = posts.concat(data.results);
+      const formatedPosts = data.results.map(post => {
+        return {
+          uid: post.uid,
+          first_publication_date: format(
+            new Date(post.last_publication_date),
+            'dd MMM yyyy',
+            { locale: ptBR }
+          ),
+          data: post.data,
+        };
+      });
+      const addPosts = posts.concat(formatedPosts);
       setPosts(addPosts);
     });
   }
@@ -74,9 +85,11 @@ export default function Home({ postsPagination }: HomeProps) {
             </Link>
           ))}
           <div className={styles.postsFooter}>
-            <button type="button" onClick={handleLoadMore}>
-              Carregar mais posts
-            </button>
+            {next && (
+              <button type="button" onClick={handleLoadMore}>
+                Carregar mais posts
+              </button>
+            )}
           </div>
         </div>
       </main>
