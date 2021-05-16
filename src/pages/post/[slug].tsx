@@ -1,4 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { RichText } from 'prismic-dom';
+import { FiCalendar, FiUser } from 'react-icons/fi';
+import Header from '../../components/Header';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -26,20 +29,64 @@ interface PostProps {
   post: Post;
 }
 
-// export default function Post() {
-//   // TODO
-// }
+export default function Post({ post }: PostProps) {
+  return (
+    <div className={commonStyles.container}>
+      {!post ? (
+        <h1>Loading</h1>
+      ) : (
+        <>
+          <div className={styles.bannerContainer}>
+            <img src={post.data.banner.url} alt="banner" />
+          </div>
+          <div className={styles.postHeader}>
+            <h1>{post.data.title}</h1>
+            <div className={styles.postInfo}>
+              <div>
+                <FiCalendar />
+                <time>{post.first_publication_date}</time>
+              </div>
+              <div>
+                <FiUser />
+                <p>{post.data.author}</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div> // post container
+  );
+}
 
-// export const getStaticPaths = async () => {
-//   const prismic = getPrismicClient();
-//   const posts = await prismic.query(TODO);
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: true,
+  };
+};
 
-//   // TODO
-// };
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug } = params;
 
-// export const getStaticProps = async context => {
-//   const prismic = getPrismicClient();
-//   const response = await prismic.getByUID(TODO);
+  const prismic = getPrismicClient();
 
-//   // TODO
-// };
+  const response = await prismic.getByUID('posts', String(slug), {});
+
+  const post = {
+    first_publication_date: response.first_publication_date,
+    data: {
+      title: response.data.title,
+      banner: {
+        url: response.data.banner.url,
+      },
+      author: response.data.author,
+      content: [...response.data.content],
+    },
+  };
+
+  return {
+    props: {
+      post,
+    },
+  };
+};

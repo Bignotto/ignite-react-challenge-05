@@ -1,1 +1,13 @@
-// TODO
+.bannerContainer {
+  background-color: yellow;
+  height: 400px;
+
+  overflow: hidden;
+
+  img {
+    // height: 400px;
+    width: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
