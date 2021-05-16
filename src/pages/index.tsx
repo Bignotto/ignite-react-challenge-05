@@ -36,12 +36,15 @@ export default function Home({ postsPagination }: HomeProps) {
   // export const Home: React.FC<HomeProps> = ({ postsPagination }: HomeProps) => {
   const { results, next_page } = postsPagination;
   const [next, setNext] = useState(next_page);
+  const [posts, setPosts] = useState<Post[]>(results);
 
   async function handleLoadMore(): Promise<void> {
     fetch(next).then(async response => {
       const data = await response.json();
       setNext(data.next_page);
-      console.log(data);
+
+      const addPosts = posts.concat(data.results);
+      setPosts(addPosts);
     });
   }
 
@@ -52,7 +55,7 @@ export default function Home({ postsPagination }: HomeProps) {
       </Head>
       <main className={commonStyles.container}>
         <div className={styles.posts}>
-          {results.map(post => (
+          {posts.map(post => (
             <Link href={`/post/${post.uid}`} key={post.uid}>
               <a>
                 <h1>{post.data.title}</h1>
@@ -70,7 +73,6 @@ export default function Home({ postsPagination }: HomeProps) {
               </a>
             </Link>
           ))}
-          {/* post item */}
           <div className={styles.postsFooter}>
             <button type="button" onClick={handleLoadMore}>
               Carregar mais posts
