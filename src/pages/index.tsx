@@ -7,6 +7,7 @@ import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -34,7 +35,16 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps) {
   // export const Home: React.FC<HomeProps> = ({ postsPagination }: HomeProps) => {
   const { results, next_page } = postsPagination;
-  console.log(next_page);
+  const [next, setNext] = useState(next_page);
+
+  async function handleLoadMore(): Promise<void> {
+    fetch(next).then(async response => {
+      const data = await response.json();
+      setNext(data.next_page);
+      console.log(data);
+    });
+  }
+
   return (
     <>
       <Head>
@@ -62,7 +72,9 @@ export default function Home({ postsPagination }: HomeProps) {
           ))}
           {/* post item */}
           <div className={styles.postsFooter}>
-            <button type="button">Carregar mais posts</button>
+            <button type="button" onClick={handleLoadMore}>
+              Carregar mais posts
+            </button>
           </div>
         </div>
       </main>
@@ -76,7 +88,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
-      pageSize: 2,
+      pageSize: 1,
     }
   );
 
