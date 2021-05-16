@@ -5,6 +5,8 @@ import { FiCalendar, FiUser } from 'react-icons/fi';
 
 import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
@@ -31,7 +33,7 @@ interface HomeProps {
 
 export default function Home({ postsPagination }: HomeProps) {
   // export const Home: React.FC<HomeProps> = ({ postsPagination }: HomeProps) => {
-  console.log({ postsPagination });
+  const { results, next_page } = postsPagination;
 
   return (
     <>
@@ -40,40 +42,25 @@ export default function Home({ postsPagination }: HomeProps) {
       </Head>
       <main className={commonStyles.container}>
         <div className={styles.posts}>
+          {results.map(post => (
+            <Link href={`/post/${post.uid}`} key={post.uid}>
+              <a>
+                <h1>{post.data.title}</h1>
+                <p>{post.data.subtitle}</p>
+                <div className={styles.postInfo}>
+                  <div>
+                    <FiCalendar />
+                    <time>{post.first_publication_date}</time>
+                  </div>
+                  <div>
+                    <FiUser />
+                    <p>{post.data.author}</p>
+                  </div>
+                </div>
+              </a>
+            </Link>
+          ))}
           {/* post item */}
-          <Link href="#">
-            <a>
-              <h1>Como Utilizar Hooks</h1>
-              <p>Pensando em sincronização ao invés de ciclos de vida.</p>
-              <div className={styles.postInfo}>
-                <div>
-                  <FiCalendar />
-                  <time>15 Mar 2021</time>
-                </div>
-                <div>
-                  <FiUser />
-                  <p>Janco Tiano</p>
-                </div>
-              </div>
-            </a>
-          </Link>
-          {/* end post item */}
-          <Link href="#">
-            <a>
-              <h1>Como Utilizar Hooks</h1>
-              <p>Pensando em sincronização ao invés de ciclos de vida.</p>
-              <div className={styles.postInfo}>
-                <div>
-                  <FiCalendar />
-                  <time>15 Mar 2021</time>
-                </div>
-                <div>
-                  <FiUser />
-                  <p>Janco Tiano</p>
-                </div>
-              </div>
-            </a>
-          </Link>
           <div className={styles.postsFooter}>
             <button type="button">Carregar mais posts</button>
           </div>
@@ -88,12 +75,29 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: ['posts.title', 'posts.subtitle'],
+      fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
       pageSize: 2,
     }
   );
-  console.log(postsResponse);
+
+  const posts = postsResponse.results.map(post => {
+    return {
+      uid: post.uid,
+      first_publication_date: format(
+        new Date(post.last_publication_date),
+        'dd MMM yyyy',
+        { locale: ptBR }
+      ),
+      data: post.data,
+    };
+  });
+
   return {
-    props: {},
+    props: {
+      postsPagination: {
+        results: posts,
+        next_page: null,
+      },
+    },
   };
 };
