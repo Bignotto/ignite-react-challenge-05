@@ -34,7 +34,7 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps) {
   // export const Home: React.FC<HomeProps> = ({ postsPagination }: HomeProps) => {
   const { results, next_page } = postsPagination;
-
+  console.log(next_page);
   return (
     <>
       <Head>
@@ -96,7 +96,7 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       postsPagination: {
         results: posts,
-        next_page: null,
+        next_page: postsResponse.next_page,
       },
     },
   };

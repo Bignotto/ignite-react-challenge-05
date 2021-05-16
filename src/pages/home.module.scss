@@ -19,7 +19,7 @@
     }
 
     p {
-      line-height: 2.5rem;
+      // line-height: 2.5rem;
       font-size: 1.125rem;
       color: var(--body);
     }
@@ -37,6 +37,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
+      margin-top: 1rem;
 
       p,
       time {
