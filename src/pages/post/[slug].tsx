@@ -33,7 +33,7 @@ export default function Post({ post }: PostProps) {
   return (
     <div className={commonStyles.container}>
       {!post ? (
-        <h1>Loading</h1>
+        <h1>Loading...</h1>
       ) : (
         <>
           <div className={styles.bannerContainer}>
@@ -51,6 +51,16 @@ export default function Post({ post }: PostProps) {
                 <p>{post.data.author}</p>
               </div>
             </div>
+          </div>
+          <div className={styles.postContent}>
+            {post.data.content.map(p => (
+              <div className={styles.postParagraph} key={p.heading}>
+                <h2>{p.heading}</h2>
+                {p.body.map(i => (
+                  <p>{i.text}</p>
+                ))}
+              </div>
+            ))}
           </div>
         </>
       )}
