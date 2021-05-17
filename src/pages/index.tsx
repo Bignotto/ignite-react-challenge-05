@@ -47,7 +47,7 @@ export default function Home({ postsPagination }: HomeProps) {
         return {
           uid: post.uid,
           first_publication_date: format(
-            new Date(post.last_publication_date),
+            new Date(post.first_publication_date),
             'dd MMM yyyy',
             { locale: ptBR }
           ),
