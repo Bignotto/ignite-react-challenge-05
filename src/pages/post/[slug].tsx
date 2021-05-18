@@ -36,6 +36,8 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const router = useRouter();
 
+  const readingTime = () => {};
+
   return (
     <div className={commonStyles.container}>
       {router.isFallback ? (
@@ -50,20 +52,32 @@ export default function Post({ post }: PostProps) {
             <div className={styles.postInfo}>
               <div>
                 <FiCalendar />
-                <time>{post.first_publication_date}</time>
+                <time>
+                  {format(
+                    new Date(post.first_publication_date),
+                    'dd MMM yyyy',
+                    { locale: ptBR }
+                  )}
+                </time>
               </div>
               <div>
                 <FiUser />
+                <p>{post.data.author}</p>
+              </div>
+              <div>
+                <FiClock />
                 <p>{post.data.author}</p>
               </div>
             </div>
           </div>
           <div className={styles.postContent}>
             {post.data.content.map(p => (
-              <>
+              <div className={styles.postParagraph} key={p.heading}>
                 <h1>{p.heading}</h1>
-                <p dangerouslySetInnerHTML={{ __html: p.body }} />
-              </>
+                <p
+                  dangerouslySetInnerHTML={{ __html: RichText.asHtml(p.body) }}
+                />
+              </div>
             ))}
           </div>
         </>
@@ -101,26 +115,22 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  const postContent = response.data.content.map(c => {
-    return {
-      heading: c.heading,
-      body: RichText.asHtml(c.body),
-    };
-  });
+  // const postContent = response.data.content.map(c => {
+  //   return {
+  //     heading: c.heading,
+  //     body: RichText.asHtml(c.body),
+  //   };
+  // });
 
   const post = {
-    first_publication_date: format(
-      new Date(response.first_publication_date),
-      'dd MMM yyyy',
-      { locale: ptBR }
-    ),
+    first_publication_date: response.first_publication_date,
     data: {
       title: response.data.title,
       banner: {
         url: response.data.banner.url,
       },
       author: response.data.author,
-      content: postContent,
+      content: response.data.content,
     },
   };
 

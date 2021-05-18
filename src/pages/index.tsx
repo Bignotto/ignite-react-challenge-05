@@ -46,11 +46,7 @@ export default function Home({ postsPagination }: HomeProps) {
       const formatedPosts = data.results.map(post => {
         return {
           uid: post.uid,
-          first_publication_date: format(
-            new Date(post.first_publication_date),
-            'dd MMM yyyy',
-            { locale: ptBR }
-          ),
+          first_publication_date: post.first_publication_date,
           data: post.data,
         };
       });
@@ -74,7 +70,13 @@ export default function Home({ postsPagination }: HomeProps) {
                 <div className={styles.postInfo}>
                   <div>
                     <FiCalendar />
-                    <time>{post.first_publication_date}</time>
+                    <time>
+                      {format(
+                        new Date(post.first_publication_date),
+                        'dd MMM yyyy',
+                        { locale: ptBR }
+                      )}
+                    </time>
                   </div>
                   <div>
                     <FiUser />
@@ -103,18 +105,14 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
-      pageSize: 1,
+      pageSize: 2,
     }
   );
 
   const posts = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: format(
-        new Date(post.last_publication_date),
-        'dd MMM yyyy',
-        { locale: ptBR }
-      ),
+      first_publication_date: post.first_publication_date,
       data: post.data,
     };
   });

@@ -12,14 +12,17 @@
 .postHeader {
   max-width: 1120px;
   margin: 0 auto;
+  margin-top: 3rem;
 
   h1 {
     color: var(--heading);
+    font-size: 3rem;
   }
 
   .postInfo {
     display: flex;
     flex-direction: row;
+    margin-top: 1.5rem;
 
     div {
       display: flex;
@@ -44,5 +47,24 @@
 .postContent {
   max-width: 1120px;
   margin: 0 auto;
-  margin-top: 2rem;
+  margin-top: 1rem;
+
+  .postParagraph {
+    h1 {
+      color: var(--heading);
+      margin-top: 2rem;
+    }
+    p,
+    ul {
+      margin: 1.5rem 0;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+
+      li {
+        margin: 0.5rem 0;
+      }
+    }
+  }
 }
