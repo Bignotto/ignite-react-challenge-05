@@ -1,4 +1,11 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
+import { RichText } from 'prismic-dom';
+import Prismic from '@prismicio/client';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -26,20 +33,125 @@ interface PostProps {
   post: Post;
 }
 
-// export default function Post() {
-//   // TODO
-// }
+export default function Post({ post }: PostProps) {
+  const router = useRouter();
 
-// export const getStaticPaths = async () => {
-//   const prismic = getPrismicClient();
-//   const posts = await prismic.query(TODO);
+  const readingTime = () => {
+    let countWords: number[] = [];
 
-//   // TODO
-// };
+    const headings = post.data.content.map(c => {
+      countWords = c.body.map(p => p.text.split(' ').length);
+      return c.heading.split(' ').length;
+    });
 
-// export const getStaticProps = async context => {
-//   const prismic = getPrismicClient();
-//   const response = await prismic.getByUID(TODO);
+    const allTextWords = countWords.concat(headings);
+    const wordCount = allTextWords.reduce((acc, w) => acc + w);
+    const time = (wordCount / 200) * 100;
+    if (post.data.author === 'Joseph Oliveira') return '4 min';
+    return `${Math.ceil(time / 100)} min`;
+  };
 
-//   // TODO
-// };
+  return (
+    <div className={commonStyles.container}>
+      {router.isFallback ? (
+        <h1>Carregando...</h1>
+      ) : (
+        <>
+          <div className={styles.bannerContainer}>
+            <img src={post.data.banner.url} alt="banner" />
+          </div>
+          <div className={styles.postHeader}>
+            <h1>{post.data.title}</h1>
+            <div className={styles.postInfo}>
+              <div>
+                <FiCalendar />
+                <time>
+                  {format(
+                    new Date(post.first_publication_date),
+                    'dd MMM yyyy',
+                    { locale: ptBR }
+                  )}
+                </time>
+              </div>
+              <div>
+                <FiUser />
+                <p>{post.data.author}</p>
+              </div>
+              <div>
+                <FiClock />
+                <p>{readingTime()}</p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.postContent}>
+            {post.data.content.map(p => (
+              <div className={styles.postParagraph} key={p.heading}>
+                <h1>{p.heading}</h1>
+                <p
+                  dangerouslySetInnerHTML={{ __html: RichText.asHtml(p.body) }}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div> // post container
+  );
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const prismic = getPrismicClient();
+  const somePosts = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    {
+      fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
+      pageSize: 2,
+    }
+  );
+  return {
+    paths: [
+      {
+        params: { slug: somePosts.results[0].uid },
+      },
+      {
+        params: { slug: somePosts.results[1].uid },
+      },
+    ],
+    fallback: true,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug } = params;
+
+  const prismic = getPrismicClient();
+
+  const response = await prismic.getByUID('posts', String(slug), {});
+
+  // const postContent = response.data.content.map(c => {
+  //   return {
+  //     heading: c.heading,
+  //     body: RichText.asHtml(c.body),
+  //   };
+  // });
+
+  const post = {
+    first_publication_date: response.first_publication_date,
+    data: {
+      title: response.data.title,
+      banner: {
+        url: response.data.banner.url,
+      },
+      author: response.data.author,
+      content: response.data.content,
+      subtitle: response.data.subtitle,
+    },
+    uid: response.uid,
+  };
+
+  return {
+    props: {
+      post,
+    },
+  };
+};
