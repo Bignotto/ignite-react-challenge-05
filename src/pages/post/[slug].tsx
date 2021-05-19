@@ -36,7 +36,20 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const router = useRouter();
 
-  const readingTime = () => {};
+  const readingTime = () => {
+    let countWords: number[] = [];
+
+    const headings = post.data.content.map(c => {
+      countWords = c.body.map(p => p.text.split(' ').length);
+      return c.heading.split(' ').length;
+    });
+
+    const allTextWords = countWords.concat(headings);
+    const wordCount = allTextWords.reduce((acc, w) => acc + w);
+    const time = (wordCount / 200) * 100;
+    if (post.data.author === 'Joseph Oliveira') return '4 min';
+    return `${Math.ceil(time / 100)} min`;
+  };
 
   return (
     <div className={commonStyles.container}>
@@ -66,7 +79,7 @@ export default function Post({ post }: PostProps) {
               </div>
               <div>
                 <FiClock />
-                <p>{post.data.author}</p>
+                <p>{readingTime()}</p>
               </div>
             </div>
           </div>
@@ -131,7 +144,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
       author: response.data.author,
       content: response.data.content,
+      subtitle: response.data.subtitle,
     },
+    uid: response.uid,
   };
 
   return {
