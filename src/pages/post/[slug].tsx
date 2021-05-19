@@ -40,14 +40,14 @@ export default function Post({ post }: PostProps) {
     let countWords: number[] = [];
 
     const headings = post.data.content.map(c => {
-      countWords = c.body.map(p => p.text.split(' ').length);
+      countWords = countWords.concat(c.body.map(p => p.text.split(' ').length));
       return c.heading.split(' ').length;
     });
 
     const allTextWords = countWords.concat(headings);
     const wordCount = allTextWords.reduce((acc, w) => acc + w);
+
     const time = (wordCount / 200) * 100;
-    if (post.data.author === 'Joseph Oliveira') return '4 min';
     return `${Math.ceil(time / 100)} min`;
   };
 
