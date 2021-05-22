@@ -1,0 +1,39 @@
+import { useEffect, useRef } from 'react';
+
+export default function Comments(): JSX.Element {
+  const commentsDiv = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (commentsDiv) {
+      const scriptEl = document.createElement('script');
+      scriptEl.setAttribute('src', 'https://utteranc.es/client.js');
+      scriptEl.setAttribute('crossorigin', 'anonymous');
+      scriptEl.setAttribute('async', 'true');
+      scriptEl.setAttribute('repo', 'Bignotto/ignite-react-challenge-05');
+      scriptEl.setAttribute('issue-term', 'pathname');
+      scriptEl.setAttribute('theme', 'github-dark');
+      commentsDiv.current.appendChild(scriptEl);
+    }
+  }, []);
+
+  return <div ref={commentsDiv} />;
+}
+
+// import React from 'react';
+
+// export default function Comments() {
+//   const utterancesString = `<script src="https://utteranc.es/client.js"
+//     repo="Bignotto/ignite-react-challenge-05"
+//     issue-term="title"
+//     label="comment"
+//     theme="github-dark"
+//     crossorigin="anonymous"
+//     async>
+//     </script>`;
+
+//   return (
+//     <>
+//       <div dangerouslySetInnerHTML={{ __html: utterancesString }} />
+//     </>
+//   );
+// }
