@@ -14,6 +14,7 @@ import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -61,26 +62,40 @@ export default function Post({ post }: PostProps) {
             <img src={post.data.banner.url} alt="banner" />
           </div>
           <div className={styles.postHeader}>
-            <h1>{post.data.title}</h1>
-            <div className={styles.postInfo}>
-              <div>
-                <FiCalendar />
-                <time>
-                  {format(
-                    new Date(post.first_publication_date),
-                    'dd MMM yyyy',
-                    { locale: ptBR }
-                  )}
-                </time>
+            <div>
+              <h1>{post.data.title}</h1>
+              <div className={styles.postInfo}>
+                <div>
+                  <FiCalendar />
+                  <time>
+                    {format(
+                      new Date(post.first_publication_date),
+                      'dd MMM yyyy',
+                      { locale: ptBR }
+                    )}
+                  </time>
+                </div>
+                <div>
+                  <FiUser />
+                  <p>{post.data.author}</p>
+                </div>
+                <div>
+                  <FiClock />
+                  <p>{readingTime()}</p>
+                </div>
               </div>
-              <div>
-                <FiUser />
-                <p>{post.data.author}</p>
-              </div>
-              <div>
-                <FiClock />
-                <p>{readingTime()}</p>
-              </div>
+            </div>
+            <div className={styles.postEdit}>
+              <p>
+                {' '}
+                {format(
+                  new Date(post.last_publication_date),
+                  "'* editado em 'dd MMM yyyy', às 'K':'mm",
+                  {
+                    locale: ptBR,
+                  }
+                )}
+              </p>
             </div>
           </div>
           <div className={styles.postContent}>
@@ -128,15 +143,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  // const postContent = response.data.content.map(c => {
-  //   return {
-  //     heading: c.heading,
-  //     body: RichText.asHtml(c.body),
-  //   };
-  // });
-
   const post = {
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
     data: {
       title: response.data.title,
       banner: {

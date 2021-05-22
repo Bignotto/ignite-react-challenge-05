@@ -42,6 +42,17 @@
       }
     }
   }
+
+  .postEdit {
+    margin-top: 0.75rem;
+
+    p,
+    time {
+      color: var(--info);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+  }
 }
 
 .postContent {
