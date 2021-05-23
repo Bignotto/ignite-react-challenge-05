@@ -1,6 +1,7 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import next, { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import { RichText } from 'prismic-dom';
+import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -15,6 +16,14 @@ import styles from './post.module.scss';
 interface Post {
   first_publication_date: string | null;
   last_publication_date: string | null;
+  next_post: {
+    title: string | null;
+    slug: string | null;
+  };
+  previous_post: {
+    title: string | null;
+    slug: string | null;
+  };
   data: {
     title: string;
     banner: {
@@ -108,6 +117,31 @@ export default function Post({ post }: PostProps) {
               </div>
             ))}
           </div>
+          <div className={styles.postFooter}>
+            <hr className={styles.separator} />
+            <div className={styles.navigation}>
+              {post.previous_post && (
+                <div className={styles.previous}>
+                  <Link href={`/post/${post.previous_post.slug}`}>
+                    <a>
+                      <p>{post.previous_post.title}</p>
+                      <p>Post anterior</p>
+                    </a>
+                  </Link>
+                </div>
+              )}
+              {post.next_post && (
+                <div className={styles.next}>
+                  <Link href={`/post/${post.next_post.slug}`}>
+                    <a>
+                      <p>{post.next_post.title}</p>
+                      <p>Próximo post</p>
+                    </a>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
           <Comments />
         </>
       )}
@@ -144,9 +178,54 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const response = await prismic.getByUID('posts', String(slug), {});
 
+  const queryOptions = {
+    fetch: ['posts.title', 'posts.uid'],
+    pageSize: 1,
+    after: `${response.id}`,
+    orderings: '[document.first_publication_date]',
+  };
+
+  const nextPost = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    queryOptions
+  );
+
+  let next_post;
+  if (nextPost.results_size > 0) {
+    next_post = {
+      title: nextPost.results[0].data.title,
+      slug: nextPost.results[0].slugs[0],
+    };
+  } else {
+    next_post = null;
+  }
+
+  const previousPost = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    {
+      ...queryOptions,
+      orderings: '[document.first_publication_date desc]',
+    }
+  );
+
+  let previous_post;
+  if (previousPost.results_size > 0) {
+    previous_post = {
+      title: previousPost.results[0].data.title,
+      slug: previousPost.results[0].slugs[0],
+    };
+  } else {
+    previous_post = null;
+  }
+
   const post = {
     first_publication_date: response.first_publication_date,
     last_publication_date: response.last_publication_date,
+
+    next_post,
+
+    previous_post,
+
     data: {
       title: response.data.title,
       banner: {

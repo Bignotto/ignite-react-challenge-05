@@ -18,22 +18,3 @@ export default function Comments(): JSX.Element {
 
   return <div ref={commentsDiv} />;
 }
-
-// import React from 'react';
-
-// export default function Comments() {
-//   const utterancesString = `<script src="https://utteranc.es/client.js"
-//     repo="Bignotto/ignite-react-challenge-05"
-//     issue-term="title"
-//     label="comment"
-//     theme="github-dark"
-//     crossorigin="anonymous"
-//     async>
-//     </script>`;
-
-//   return (
-//     <>
-//       <div dangerouslySetInnerHTML={{ __html: utterancesString }} />
-//     </>
-//   );
-// }
