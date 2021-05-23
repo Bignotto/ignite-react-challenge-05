@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import Link from 'next/link';
 import { getPrismicClient } from '../../services/prismic';
 import Comments from '../../components/Comments';
 
@@ -107,6 +108,23 @@ export default function Post({ post }: PostProps) {
                 />
               </div>
             ))}
+          </div>
+          <div className={styles.postFooter}>
+            <hr className={styles.separator} />
+            <div className={styles.navigation}>
+              <div className={styles.previous}>
+                <a>
+                  <p>Título post anterior</p>
+                  <p>Post anterior</p>
+                </a>
+              </div>
+              <div className={styles.next}>
+                <a>
+                  <p>Título próximo post</p>
+                  <p>Próximo post</p>
+                </a>
+              </div>
+            </div>
           </div>
           <Comments />
         </>
