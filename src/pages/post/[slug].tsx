@@ -16,6 +16,14 @@ import styles from './post.module.scss';
 interface Post {
   first_publication_date: string | null;
   last_publication_date: string | null;
+  next_post: {
+    title: string | null;
+    slug: string | null;
+  };
+  previous_post: {
+    title: string | null;
+    slug: string | null;
+  };
   data: {
     title: string;
     banner: {
@@ -162,6 +170,18 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const response = await prismic.getByUID('posts', String(slug), {});
 
+  const queryOptions = {
+    fetch: ['posts.title', 'posts.uid'],
+    pageSize: 1,
+    after: `${response.id}`,
+    orderings: '[my.posts.first_publication_date]',
+  };
+
+  const nextPost = await prismic.query(
+    [Prismic.predicates.at('document.type', 'posts')],
+    queryOptions
+  );
+  console.log(nextPost.results[0]);
   const post = {
     first_publication_date: response.first_publication_date,
     last_publication_date: response.last_publication_date,
