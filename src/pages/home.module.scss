@@ -69,3 +69,21 @@
     }
   }
 }
+.exitPreviewButton {
+  margin: 0 auto;
+  width: 700px;
+  height: 58px;
+  border-radius: 4px;
+  margin-top: 5rem;
+  background-color: var(--heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    color: var(--background);
+    font-size: 1.125rem;
+    font-weight: bold;
+    background: transparent;
+  }
+}
